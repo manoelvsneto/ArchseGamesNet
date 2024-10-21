@@ -1,0 +1,52 @@
+#pool:
+  #name: BareMetal
+  #vmImage: 'ubuntu-22.10'
+
+
+trigger:
+- master
+resources:
+- repo: self
+variables:
+  imagePullSecret: 'regcred'
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+  - job: Build
+    displayName: Build
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'DockerConnection'
+        repository: 'manoelvsneto/archsewebapi'
+        command: 'buildAndPush'
+        tags: '$(Build.BuildId)'
+        Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+
+    - task: KubernetesManifest@0
+      displayName: Create imagePullSecret
+      inputs:
+        kubernetesServiceConnection: AzureKS
+        action: createSecret
+        secretName: $(imagePullSecret)
+        dockerRegistryEndpoint: 'DockerConnection'
+    
+    - task: PublishPipelineArtifact@1
+      displayName: Publish Report
+      inputs:
+        artifact: '_Archse.WebApi'
+        publishLocation: 'pipeline'
+    
+    - task: KubernetesManifest@0
+      displayName: Deploy to Kubernetes cluster
+      inputs:
+        kubernetesServiceConnection: AzureKS
+        action: deploy
+        manifests: |
+          $(Build.SourcesDirectory)/Archse.WebApi/deployment.yaml
+          $(Build.SourcesDirectory)/Archse.WebApi/service.yaml
+          $(Build.SourcesDirectory)/Archse.WebApi/ingress-aks.yaml
+        imagePullSecrets: |
+          $(imagePullSecret)
+        containers: 'manoelvsneto/archsewebapi:$(Build.BuildId)'

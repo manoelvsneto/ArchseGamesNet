@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: worker-ingress
+  annotations:
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+    #cert-manager.io/cluster-issuer: letsencrypt-issuer
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  tls:
+  - secretName: backend-archse-eng-br-tls
+    hosts:
+    - backend.archse.eng.br
+  rules:
+  - host: backend.archse.eng.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: worker-service
+            port:
+              name: http

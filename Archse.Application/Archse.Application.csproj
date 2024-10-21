@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="MassTransit" Version="8.0.16" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Archse.Events\Archse.Events.csproj" />
+    <ProjectReference Include="..\Archse.Exception\Archse.Exception.csproj" />
+    <ProjectReference Include="..\Archse.Models\Archse.Models.csproj" />
+    <ProjectReference Include="..\Archse.Publisher\Archse.Publisher.csproj" />
+    <ProjectReference Include="..\Archse.Service\Archse.Service.csproj" />
+  </ItemGroup>
+
+</Project>
